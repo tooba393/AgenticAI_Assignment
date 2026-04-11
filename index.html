@@ -2,37 +2,443 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Email Reply Assistant</title>
     <style>
-        body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f9f9f9; color:#333; }
-        header { background:#4A90E2; color:white; padding:60px 20px; text-align:center; }
-        header h1 { font-size:2.5em; margin-bottom:10px; }
-        header p { font-size:1.2em; opacity:0.9; }
-        .features { display:flex; flex-wrap:wrap; justify-content:center; padding:40px 20px; gap:20px; }
-        .feature { background:white; border-radius:8px; padding:20px; width:250px; box-shadow:0 2px 8px rgba(0,0,0,0.1); }
-        .feature h3 { color:#4A90E2; }
-        .cta { text-align:center; padding:40px; background:#eef4ff; }
-        .cta h2 { margin-bottom:20px; }
-        .cta button { background:#4A90E2; color:white; border:none; padding:15px 40px; font-size:1.1em; border-radius:5px; cursor:pointer; }
-        .cta button:hover { background:#357ABD; }
-        footer { text-align:center; padding:20px; color:#999; font-size:0.9em; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0d0d1a;
+            color: #e0e0f0;
+            overflow-x: hidden;
+        }
+
+        /* ── NAVBAR ── */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 60px;
+            background: rgba(13,13,26,0.95);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(150,100,255,0.15);
+        }
+        .nav-logo {
+            font-size: 1.4em;
+            font-weight: 800;
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .nav-links a {
+            color: #b0b0d0;
+            text-decoration: none;
+            margin-left: 30px;
+            font-size: 0.95em;
+            transition: color 0.3s;
+        }
+        .nav-links a:hover { color: #a855f7; }
+
+        /* ── HERO ── */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 80px 20px;
+            background: radial-gradient(ellipse at 50% 0%, rgba(139,92,246,0.25) 0%, transparent 70%),
+                        radial-gradient(ellipse at 80% 80%, rgba(99,102,241,0.15) 0%, transparent 60%),
+                        #0d0d1a;
+            position: relative;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(139,92,246,0.12) 0%, transparent 70%);
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+        .hero-badge {
+            display: inline-block;
+            background: rgba(139,92,246,0.15);
+            border: 1px solid rgba(139,92,246,0.4);
+            color: #c084fc;
+            padding: 6px 18px;
+            border-radius: 50px;
+            font-size: 0.85em;
+            font-weight: 500;
+            margin-bottom: 28px;
+            letter-spacing: 0.5px;
+        }
+        .hero h1 {
+            font-size: clamp(2.5em, 6vw, 4.5em);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #ffffff 0%, #c084fc 50%, #818cf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero p {
+            font-size: 1.2em;
+            color: #9090b0;
+            max-width: 600px;
+            line-height: 1.7;
+            margin-bottom: 40px;
+        }
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        /* ── BUTTONS ── */
+        .btn-primary {
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            color: white;
+            border: none;
+            padding: 16px 36px;
+            font-size: 1em;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 24px rgba(139,92,246,0.35);
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+            transition: left 0.4s;
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 8px 32px rgba(139,92,246,0.55);
+        }
+        .btn-primary:hover::before { left: 100%; }
+        .btn-primary:active { transform: translateY(0) scale(0.98); }
+
+        .btn-secondary {
+            background: transparent;
+            color: #c084fc;
+            border: 1px solid rgba(139,92,246,0.5);
+            padding: 16px 36px;
+            font-size: 1em;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-secondary:hover {
+            background: rgba(139,92,246,0.1);
+            border-color: #a855f7;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 20px rgba(139,92,246,0.2);
+        }
+
+        /* ── SECTIONS ── */
+        section {
+            padding: 100px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .section-label {
+            text-align: center;
+            color: #a855f7;
+            font-size: 0.85em;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+        .section-title {
+            text-align: center;
+            font-size: clamp(1.8em, 4vw, 2.8em);
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #f0f0ff;
+        }
+        .section-subtitle {
+            text-align: center;
+            color: #7070a0;
+            max-width: 550px;
+            margin: 0 auto 60px;
+            line-height: 1.7;
+        }
+
+        /* ── FEATURES ── */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+        .feature-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(139,92,246,0.15);
+            border-radius: 20px;
+            padding: 32px;
+            transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #8b5cf6, transparent);
+            opacity: 0;
+            transition: opacity 0.35s;
+        }
+        .feature-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(139,92,246,0.4);
+            background: rgba(139,92,246,0.07);
+            box-shadow: 0 20px 60px rgba(139,92,246,0.15);
+        }
+        .feature-card:hover::before { opacity: 1; }
+        .feature-icon {
+            font-size: 1.8em;
+            margin-bottom: 16px;
+            display: inline-block;
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .feature-card h3 {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #e0e0f8;
+            margin-bottom: 10px;
+        }
+        .feature-card p {
+            color: #7070a0;
+            font-size: 0.92em;
+            line-height: 1.7;
+        }
+
+        /* ── PERSONAS ── */
+        .personas-section { background: rgba(139,92,246,0.04); border-radius: 32px; }
+        .personas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+        }
+        .persona-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 28px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .persona-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(139,92,246,0.35);
+            box-shadow: 0 12px 40px rgba(139,92,246,0.12);
+        }
+        .persona-avatar {
+            width: 60px; height: 60px;
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            font-weight: 700;
+            color: white;
+            margin: 0 auto 16px;
+        }
+        .persona-card h4 { font-size: 1.1em; font-weight: 600; color: #e0e0f8; margin-bottom: 6px; }
+        .persona-role {
+            background: rgba(139,92,246,0.2);
+            color: #c084fc;
+            padding: 3px 12px;
+            border-radius: 50px;
+            font-size: 0.8em;
+            font-weight: 500;
+            display: inline-block;
+            margin-bottom: 14px;
+        }
+        .persona-card p { color: #7070a0; font-size: 0.9em; line-height: 1.6; font-style: italic; }
+
+        /* ── USER STORIES ── */
+        .stories-list {
+            list-style: none;
+            max-width: 700px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .story-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(139,92,246,0.15);
+            border-left: 3px solid #8b5cf6;
+            border-radius: 10px;
+            padding: 18px 24px;
+            color: #b0b0d0;
+            font-size: 0.95em;
+            line-height: 1.6;
+            transition: all 0.3s;
+        }
+        .story-item:hover {
+            background: rgba(139,92,246,0.07);
+            color: #e0e0f8;
+            transform: translateX(6px);
+        }
+
+        /* ── CTA ── */
+        .cta-section {
+            text-align: center;
+            padding: 100px 20px;
+            background: radial-gradient(ellipse at 50% 50%, rgba(139,92,246,0.18) 0%, transparent 70%);
+            border-top: 1px solid rgba(139,92,246,0.1);
+        }
+        .cta-section h2 {
+            font-size: clamp(2em, 5vw, 3.5em);
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+        }
+        .cta-section p { color: #7070a0; margin-bottom: 36px; font-size: 1.1em; }
+
+        /* ── FOOTER ── */
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: #404060;
+            font-size: 0.85em;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        footer span { color: #6b46c1; }
     </style>
 </head>
 <body>
-    <header>
-        <h1>AI Email Reply Assistant</h1>
-        <p>AI Email Reply Assistant drafts smart, context-aware replies instantly for busy professionals, university students, and freelancers, saving time and improving email communication.</p>
-    </header>
-    <section>
-        <h2 style="text-align:center; padding-top:30px;">Core Features</h2>
-        <div class="features"><div class='feature'><h3>Email Scanning and Analysis</h3><p>Automatically scans and analyzes incoming emails to detect context, intent, and tone.</p></div><div class='feature'><h3>Reply Suggestion Generation</h3><p>Generates smart, context-aware reply suggestions based on the analyzed email content and AI understanding.</p></div><div class='feature'><h3>Tone and Style Matching</h3><p>Ensures the generated reply matches the user's tone, style, and branding requirements.</p></div><div class='feature'><h3>Integration with Email Clients and Calendars</h3><p> Seamlessly integrates with popular email clients and calendars to streamline email management and scheduling.</p></div><div class='feature'><h3>Advanced Analytics and Feedback</h3><p>Provides users with analytics and feedback on email performance, helping them refine their communication and improve email efficiency.</p></div></div>
-    </section>
-    <div class="cta">
-        <h2>Ready to streamline your emails?</h2>
-        <button onclick="alert('Coming Soon! Sign up at our website.')">Get Started Today</button>
+
+    <nav>
+        <div class="nav-logo">✦ ReplyAI</div>
+        <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#users">Who It's For</a>
+            <a href="#stories">Stories</a>
+            <a href="#cta">Get Started</a>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <div class="hero">
+        <div class="hero-badge">🚀 Powered by AI · Built for Productivity</div>
+        <h1>Reply Smarter.<br>Not Harder.</h1>
+        <p>Automates email reply drafting for busy professionals, students, and freelancers, saving time and effort in communication.</p>
+        <div class="hero-buttons">
+            <button class="btn-primary" onclick="alert('Sign up coming soon!')">Get Started Free</button>
+            <button class="btn-secondary" onclick="alert('Watch demo coming soon!')">Watch Demo →</button>
+        </div>
     </div>
+
+    <!-- FEATURES -->
+    <section id="features">
+        <p class="section-label">What We Offer</p>
+        <h2 class="section-title">Everything You Need</h2>
+        <p class="section-subtitle">Powerful features designed to eliminate email overwhelm and boost your productivity.</p>
+        <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon">✦</div>
+            <h3>AI-powered Email Reading</h3>
+            <p>Uses natural language processing (NLP) to read and comprehend the content of incoming emails, extracting essential information.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">✦</div>
+            <h3>Context-Aware Reply Suggestions</h3>
+            <p>Generates relevant and context-specific reply suggestions based on the email content, tone, and intent.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">✦</div>
+            <h3>Customizable Email Templates</h3>
+            <p>Allows users to create and save custom email templates for common use cases, streamlining the reply process.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">✦</div>
+            <h3>Integrations with Popular Email Clients</h3>
+            <p>Supports seamless integration with popular email clients, such as Gmail, Outlook, and Apple Mail.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">✦</div>
+            <h3>Data Analytics and Insights</h3>
+            <p>Provides users with data analytics and insights on their email communication patterns, enabling informed decision-making.</p>
+        </div></div>
+    </section>
+
+    <!-- PERSONAS -->
+    <section id="users" style="background:rgba(139,92,246,0.04); border-radius:32px; padding:80px 40px;">
+        <p class="section-label">Who It's For</p>
+        <h2 class="section-title">Built For Real People</h2>
+        <p class="section-subtitle">Whether you're a professional, student, or freelancer — ReplyAI fits your workflow.</p>
+        <div class="personas-grid">
+        <div class="persona-card">
+            <div class="persona-avatar">A</div>
+            <h4>Alex</h4>
+            <span class="persona-role">Busy Professional</span>
+            <p>"Spend a significant amount of time composing and editing emails, which can be a significant barrier to productivity."</p>
+        </div>
+        <div class="persona-card">
+            <div class="persona-avatar">S</div>
+            <h4>Sara</h4>
+            <span class="persona-role">University Student</span>
+            <p>"Struggle to compose clear and professional emails, which can negatively impact their academic and professional reputation."</p>
+        </div>
+        <div class="persona-card">
+            <div class="persona-avatar">M</div>
+            <h4>Mike</h4>
+            <span class="persona-role">Freelancer</span>
+            <p>"Tend to respond to client emails slowly due to tight deadlines, which can lead to missed opportunities and strained relationships."</p>
+        </div></div>
+    </section>
+
+    <!-- USER STORIES -->
+    <section id="stories">
+        <p class="section-label">User Stories</p>
+        <h2 class="section-title">How People Use ReplyAI</h2>
+        <p class="section-subtitle">Real scenarios where ReplyAI saves time and improves communication.</p>
+        <ul class="stories-list"><li class="story-item">📌 As a busy professional, I want AI to draft email replies so that I save 2 hours daily.</li><li class="story-item">📌 As a student, I want smart email suggestions so that I communicate professionally.</li><li class="story-item">📌 As a freelancer, I want quick client email replies so that I maintain relationships efficiently.</li></ul>
+    </section>
+
+    <!-- CTA -->
+    <div class="cta-section" id="cta">
+        <h2>Ready to Transform<br>Your Inbox?</h2>
+        <p>Join thousands of professionals saving hours every week.</p>
+        <button class="btn-primary" onclick="alert('Sign up coming soon!')">Start For Free Today</button>
+    </div>
+
     <footer>
-        <p>Generated by EngineerAgent &lt;agent@launchmind.ai&gt; | AI Email Reply Assistant &copy; 2026</p>
+        <p>Generated by <span>EngineerAgent &lt;agent@launchmind.ai&gt;</span> · AI Email Reply Assistant © 2026</p>
     </footer>
+
 </body>
 </html>
